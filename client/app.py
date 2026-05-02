@@ -142,15 +142,56 @@ TRAIT_COLORS = {
     "OPN": "#ba7517",
 }
 
+# Per-trait MAE on 1–5 scale vs number of answered items K (from offline eval).
+# Columns: EXT, EST, AGR, CSN, OPN — see project notebooks / Detail.md.
+_MAE_K_ANCHORS: tuple[int, ...] = (5, 10, 15, 20, 25, 30, 35, 40, 43, 49)
+_MAE_ROWS: tuple[tuple[float, float, float, float, float], ...] = (
+    (0.2480, 0.4574, 0.2493, 0.2758, 0.2621),
+    (0.2366, 0.3944, 0.2318, 0.2573, 0.2387),
+    (0.2216, 0.3370, 0.2137, 0.2377, 0.2154),
+    (0.2038, 0.2849, 0.1946, 0.2166, 0.1925),
+    (0.1834, 0.2380, 0.1742, 0.1939, 0.1694),
+    (0.1607, 0.1948, 0.1522, 0.1695, 0.1456),
+    (0.1348, 0.1544, 0.1277, 0.1423, 0.1203),
+    (0.1042, 0.1137, 0.0987, 0.1102, 0.0917),
+    (0.0816, 0.0869, 0.0773, 0.0864, 0.0712),
+    (0.0156, 0.0160, 0.0148, 0.0166, 0.0135),
+)
 
-def precision_pct(n: int) -> int:
-    if n <= 0:
-        return 10
-    if n < 5:
-        return round(12 + n * 5)
-    cap30 = 40 + (min(n, 30) - 5) / 25 * 55
-    extra = (n - 30) / 20 * 5 if n > 30 else 0
-    return min(100, round(cap30 + extra))
+
+def _mean_trait_mae_at_k(k: float) -> float:
+    """Average MAE across five traits at answered-count K (linear segments between anchors)."""
+    if k >= 50:
+        return 0.0
+    if k <= 0:
+        return sum(_MAE_ROWS[0]) / 5.0
+    anchors = _MAE_K_ANCHORS
+    rows = _MAE_ROWS
+    if k <= anchors[0]:
+        return sum(rows[0]) / 5.0
+    if k >= anchors[-1]:
+        return sum(rows[-1]) / 5.0
+    for i in range(len(anchors) - 1):
+        lo, hi = anchors[i], anchors[i + 1]
+        if lo <= k <= hi:
+            t = (k - lo) / (hi - lo) if hi != lo else 0.0
+            blended = tuple(
+                rows[i][j] * (1 - t) + rows[i + 1][j] * t for j in range(5)
+            )
+            return sum(blended) / 5.0
+    return sum(rows[-1]) / 5.0
+
+
+def trust_pct_from_answered_count(n_answered: int) -> int:
+    """Map mean per-trait MAE at K to a 0–100% confidence score (lower MAE → higher %)."""
+    if n_answered >= 50:
+        return 100
+    if n_answered <= 0:
+        return 5
+    mm = _mean_trait_mae_at_k(float(n_answered))
+    # ~0.30 MAE @ K≈5 → ~82%; ~0.015 @ K≈49 → ~99%
+    raw = 100.0 - mm * 60.0
+    return max(5, min(100, round(raw)))
 
 
 def score_label(s: float) -> str:
@@ -495,7 +536,7 @@ def render_quiz(pred_bundle: dict[str, Any] | None) -> None:
     with c1:
         st.caption(f"ตอบไปแล้ว **{n_ans}** ข้อ")
     with c2:
-        st.caption(f"~**{precision_pct(n_ans)}**% แม่น")
+        st.caption(f"~**{trust_pct_from_answered_count(n_ans)}**% แม่น")
 
     st.markdown(
         f'<div class="quiz-card" style="--accent-trait: {trait_color}">'
@@ -611,7 +652,7 @@ def render_results(pred_bundle: dict[str, Any] | None) -> None:
     out = predict_fn(answers)
     n_answered = out["n_answered"]
     n_fill = 50 - n_answered
-    conf = precision_pct(n_answered)
+    conf = trust_pct_from_answered_count(n_answered)
     trait_scores: dict[str, float] = out["trait_scores"]
     primary = out["primary"]
     secondary = out["secondary"]
@@ -660,8 +701,7 @@ def render_results(pred_bundle: dict[str, Any] | None) -> None:
             '<span style="font-size:10px;padding:3px 10px;border-radius:99px;'
             'color:#b9f5e8;border:1px solid rgba(100,220,200,0.4);background:rgba(30,80,70,0.3)">คุณตอบ</span>'
             if is_user
-            else '<span style="font-size:10px;padding:3px 10px;border-radius:99px;'
-            'color:#d4ccff;border:1px solid rgba(160,140,255,0.45);background:rgba(80,60,140,0.28)">โมเดลประมาณ</span>'
+            else ""
         )
         st.markdown(
             f'<div class="meme-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">'
