@@ -142,8 +142,197 @@ TRAIT_COLORS = {
     "OPN": "#ba7517",
 }
 
+# ---------------------------------------------------------------------------
+# Paragraph copy — 9 slots per trait, each slot covers 0.5 of the 1–5 scale.
+# slot_idx = min(8, int((score - 1) / 0.5))
+# slot 0 = 1.0–1.5 … slot 8 = 5.0
+# Each entry: (short_tag, paragraph)
+# ---------------------------------------------------------------------------
+TRAIT_PARAGRAPHS: dict[str, list[tuple[str, str]]] = {
+    "EXT": [
+        ("เก็บตัวสุดๆ",
+         "คุณได้พลังงานจากการอยู่คนเดียวเต็มๆ โลกข้างในมีความสุขและความหมายให้คุณมากกว่าการสังสรรค์ คนรอบข้างอาจดูคุณเงียบ แต่นั่นคือวิธีที่คุณอยู่ได้ดีที่สุด"),
+        ("เก็บตัวมาก",
+         "การอยู่กับตัวเองคือการชาร์จแบตจริงๆ คุณเลือกสังคมอย่างระมัดระวัง ไม่ใช่เพราะขี้อาย แต่เพราะรู้ว่าพลังงานของตัวเองมีค่า"),
+        ("ค่อนข้างเก็บตัว",
+         "คุณไม่ได้กลัวคน แค่ไม่ได้หิวสังคมเท่าคนอื่น ปาร์ตี้ใหญ่ดูน่าเหนื่อย แต่คุยกับเพื่อนสนิทสักคนสองคนนั้นโอเคมาก"),
+        ("กลางๆ เอียงเก็บตัว",
+         "คุณอยู่กับคนอื่นได้สบายๆ แต่ก็ต้องการเวลาคนเดียวเป็นระยะๆ ถ้าสังคมเยอะเกินไปติดกันหลายวัน คุณจะรู้สึกเหนื่อยนิดนึง"),
+        ("กลางๆ",
+         "คุณยืดหยุ่นได้ดีมาก บางวันก็อยากออกไปเจอคน บางวันก็ขอนอนอยู่บ้าน ขึ้นอยู่กับอารมณ์และสถานการณ์มากกว่าสไตล์ตายตัว"),
+        ("กลางๆ เอียงเปิดเผย",
+         "คุณชอบอยู่กับคนอื่นและมักรู้สึกดีขึ้นหลังออกสังคม แต่ก็ไม่ได้รู้สึกแย่ถ้าต้องอยู่คนเดียวบ้าง"),
+        ("ค่อนข้างเปิดเผย",
+         "คุณสนุกกับการพบปะผู้คน เริ่มต้นบทสนทนาได้ไม่ยาก และมักเป็นคนที่ทำให้บรรยากาศในกลุ่มดีขึ้น"),
+        ("เปิดเผยมาก",
+         "คุณชาร์จแบตจากการอยู่กับคนอื่น ยิ่งมีคนเยอะยิ่งสนุก คุณเป็นคนที่ดึงพลังงานมาให้ทั้งวง และมักเป็นคนที่ทุกคนจำได้"),
+        ("ขวัญใจมหาชน",
+         "คุณเกิดมาเพื่ออยู่กับผู้คน การสังสรรค์คือการเติมพลัง ไม่ใช่การสิ้นเปลือง คุณรู้สึกมีชีวิตชีวาที่สุดเมื่ออยู่ท่ามกลางฝูงชน"),
+    ],
+    "EST": [
+        ("นิ่งสงบมาก",
+         "อารมณ์คุณมั่นคงมาก แทบไม่มีอะไรทำให้คุณหวั่นไหวได้ง่ายๆ คนรอบข้างมักพึ่งพาคุณในยามที่ทุกอย่างวุ่นวาย เพราะรู้ว่าคุณไม่ตื่นตระหนก"),
+        ("อารมณ์มั่นคง",
+         "คุณรับมือกับความเครียดได้ดีกว่าคนส่วนใหญ่ เมื่อเจอปัญหาคุณมักมองหาทางออกก่อน ไม่ใช่จมอยู่กับความรู้สึก"),
+        ("ค่อนข้างนิ่ง",
+         "คุณไม่ได้เครียดง่าย แต่ก็ไม่ได้หุ่นยนต์ เจอเรื่องใหญ่จริงๆ ก็รู้สึกอยู่ แต่ไม่นานก็กลับมาสู่สมดุลได้เอง"),
+        ("กลางๆ เอียงนิ่ง",
+         "คุณมักจัดการอารมณ์ได้ดี แต่มีบางสถานการณ์ที่กังวลหรือเครียดได้บ้าง ซึ่งก็เป็นเรื่องปกติมาก"),
+        ("กลางๆ",
+         "คุณรู้สึกกับสิ่งต่างๆ ได้ปกติ บางครั้งก็เครียดบางครั้งก็โอเค ขึ้นอยู่กับเหตุการณ์มากกว่าอุปนิสัยตายตัว"),
+        ("กลางๆ เอียงกังวล",
+         "คุณรู้สึกถึงความกดดันได้ชัด และบางครั้งก็วนคิดเรื่องเดิมอยู่นาน แต่ก็ผ่านมาได้ในที่สุด"),
+        ("ค่อนข้างกังวล",
+         "คุณรับรู้และประมวลอารมณ์ได้ลึก ซึ่งทำให้คุณเห็นอกเห็นใจคนอื่นได้มาก แต่ก็หมายความว่าความเครียดสะสมได้ง่ายถ้าไม่ระวัง"),
+        ("กังวลบ่อย",
+         "อารมณ์ของคุณเคลื่อนไหวเร็ว คุณรู้สึกทุกอย่างอย่างเต็มที่ ซึ่งเป็นพรและความท้าทายในเวลาเดียวกัน การดูแลตัวเองเป็นสิ่งสำคัญมากสำหรับคุณ"),
+        ("อารมณ์เข้มข้น",
+         "คุณมีชีวิตอารมณ์ที่สมบูรณ์และเข้มข้นมาก รู้สึกดีใจได้สุดขั้วและเศร้าได้ลึก การหาพื้นที่ปลอดภัยให้กับตัวเองเป็นเรื่องสำคัญมาก"),
+    ],
+    "AGR": [
+        ("ตรงไปตรงมามาก",
+         "คุณพูดสิ่งที่คิดโดยไม่ค่อยกรองผ่านเลนส์ความรู้สึกของคนอื่น ไม่ใช่เรื่องเลว — คุณแค่ให้ความจริงมากกว่าความสบายใจ"),
+        ("ยึดจุดยืนตัวเอง",
+         "คุณไม่ได้ใส่ใจว่าคนอื่นจะรู้สึกยังไงกับความคิดเห็นของคุณมาก สิ่งที่คิดว่าถูกต้องคือสิ่งที่จะพูด"),
+        ("มีจุดยืนชัด",
+         "คุณแคร์คนบ้าง แต่ไม่ได้ยอมตามทุกอย่างเพื่อรักษาความสัมพันธ์ คุณเลือกว่าเรื่องไหนควรยืน เรื่องไหนควรยืดหยุ่น"),
+        ("กลางๆ เอียงตรง",
+         "คุณมีน้ำใจแต่ก็มีขอบเขต ไม่ยอมทุกอย่างแต่ก็ไม่ได้แข็งกระด้าง คนส่วนใหญ่รู้สึกสบายใจพอที่จะคุยกับคุณได้"),
+        ("สมดุลดี",
+         "คุณแคร์คนอื่นและก็รักษาจุดยืนตัวเองได้พอๆ กัน ไม่ได้โอนอ่อนทุกอย่าง แต่ก็ไม่ได้แข็งจนคนเข้าไม่ถึง"),
+        ("กลางๆ เอียงอ่อนโยน",
+         "คุณมักพยายามทำให้ทุกคนรู้สึกดี และมักประนีประนอมได้ง่าย บางทีอาจเก็บความรู้สึกตัวเองไว้แทนที่จะพูดออกมา"),
+        ("ใจอ่อนใจดี",
+         "คุณเข้าใจความรู้สึกคนอื่นได้ดีมากและมักเอาใจเขามาใส่ใจเรา แต่อย่าลืมดูแลความต้องการของตัวเองด้วยนะ"),
+        ("เอาใจใส่สูง",
+         "คุณรู้สึกได้ถึงอารมณ์ของคนรอบข้างเกือบจะทันที และมักจะทำทุกอย่างเพื่อช่วย ทักษะนี้ทรงพลังมาก แต่ก็เหนื่อยได้ถ้าไม่มีขอบเขต"),
+        ("เอาใจคนเก่งมาก",
+         "คุณอ่านคนออกเก่งมาก รู้ว่าใครต้องการอะไรก่อนที่เขาจะพูด คุณทำให้คนรอบข้างรู้สึกว่าตัวเองมีคุณค่าและถูกเห็น"),
+    ],
+    "CSN": [
+        ("ชีวิตอิสระมาก",
+         "คุณใช้ชีวิตตามสัญชาตญาณ ไม่ผูกตัวเองกับตารางหรือแผนงานมากเกินไป บางคนอาจเรียกว่าไม่มีระเบียบ แต่คุณเรียกมันว่าอิสรภาพ"),
+        ("ยืดหยุ่นสูง",
+         "คุณปรับตัวตามสถานการณ์ได้ดีมาก แต่บางครั้งก็อาจลืมนัดหรือทำอะไรค้างไว้บ้าง ซึ่งไม่ได้ทำให้คุณไม่ดี แค่ไม่ได้เน้นโครงสร้างมาก"),
+        ("ค่อนข้างยืดหยุ่น",
+         "คุณมีระเบียบในเรื่องที่สำคัญกับคุณ แต่ไม่ได้แคร์กับเรื่องที่ไม่จำเป็น คุณรู้ว่าตัวเองต้องการอะไรและจัดการได้ในแบบของตัวเอง"),
+        ("กลางๆ เอียงอิสระ",
+         "คุณวางแผนได้เมื่อจำเป็น แต่ไม่ได้ชอบถูกผูกไว้กับตารางเป๊ะๆ มีระเบียบเพียงพอที่จะทำสิ่งต่างๆ ได้ แต่ก็มีพื้นที่สำหรับ spontaneity เสมอ"),
+        ("สมดุลดี",
+         "คุณมีทั้งระเบียบและความยืดหยุ่นในสัดส่วนที่พอดี วางแผนได้เมื่อต้องการ ปรับเปลี่ยนได้เมื่อจำเป็น"),
+        ("กลางๆ เอียงมีระเบียบ",
+         "คุณชอบมีโครงสร้างพอสมควร และมักทำตามแผนที่วางไว้ได้ดีกว่าคนส่วนใหญ่ รู้สึกดีกว่าเมื่อทุกอย่างอยู่ในที่ของมัน"),
+        ("ค่อนข้างมีระเบียบ",
+         "คุณรับผิดชอบได้ดีและมักทำงานเสร็จก่อนกำหนด ความเป็นระเบียบของคุณทำให้คนอื่นไว้วางใจได้"),
+        ("วางแผนเก่ง",
+         "คุณมีระบบชัดเจนในการจัดการชีวิต ไม่ว่าจะเป็น to-do list, ตาราง, หรือแผนระยะยาว คนรอบข้างมักพึ่งพาคุณในเรื่องที่ต้องการความรอบคอบ"),
+        ("มีระเบียบมากๆ",
+         "คุณทำงานอย่างรอบคอบและตั้งใจในทุกอย่างที่ทำ ชีวิตคุณมีโครงสร้างที่ชัดเจน และคุณรู้สึกดีที่สุดเมื่อทุกอย่างอยู่ในที่ที่ควรอยู่"),
+    ],
+    "OPN": [
+        ("ชอบสิ่งคุ้นเคย",
+         "คุณให้ความสำคัญกับสิ่งที่ได้ผลจริงๆ มากกว่าการทดลองใหม่ๆ ความมั่นคงและสิ่งที่รู้จักดีมีคุณค่ามากสำหรับคุณ"),
+        ("ปฏิบัตินิยม",
+         "คุณมองโลกในแง่ที่จับต้องได้ ไม่ค่อยหลงไปกับทฤษฎีหรือจินตนาการ คุณเน้นสิ่งที่ได้ผลจริงในชีวิตจริง"),
+        ("ค่อนข้างปฏิบัติจริง",
+         "คุณเปิดรับสิ่งใหม่บ้างเมื่อมันพิสูจน์ตัวเองแล้ว ไม่ได้รีบตะครุบทุกเทรนด์ใหม่ แต่ก็ไม่ได้ปิดกั้นตัวเองจากการเปลี่ยนแปลง"),
+        ("กลางๆ เอียงปฏิบัติ",
+         "คุณมีความคิดสร้างสรรค์เป็นระยะๆ แต่มักกลับมาสู่สิ่งที่รู้จักและเชื่อถือได้ สมดุลระหว่างการสำรวจและความปลอดภัย"),
+        ("กลางๆ",
+         "คุณสนใจทั้งสิ่งใหม่และสิ่งที่คุ้นเคย บางวันอยากลองอะไรแปลกๆ บางวันก็ขอสิ่งเดิมที่ไว้ใจได้"),
+        ("กลางๆ เอียงสำรวจ",
+         "คุณชอบแนวคิดใหม่ๆ และมักพบว่าตัวเองถูกดึงดูดไปยังหัวข้อที่หลากหลาย ความอยากรู้ของคุณนำคุณไปในที่ที่น่าสนใจเสมอ"),
+        ("ชอบสำรวจ",
+         "คุณมีจินตนาการที่สดใสและชอบคิดนอกกรอบ แนวคิดซับซ้อนและคำถามปรัชญาทำให้คุณสนุก ไม่ใช่ปวดหัว"),
+        ("นักจินตนาการ",
+         "โลกในหัวคุณมีความสมบูรณ์และน่าสนใจมาก คุณเชื่อมโยงแนวคิดที่คนอื่นไม่เห็นความสัมพันธ์ได้ ความคิดสร้างสรรค์ของคุณเป็นทรัพยากรที่ทรงพลัง"),
+        ("นักฝันสุดขีด",
+         "จินตนาการคุณทำงานตลอดเวลา คุณเห็นความเป็นไปได้ในทุกที่และคิดในเชิงนามธรรมได้เป็นธรรมชาติ โลกต้องการคนที่ฝันแบบคุณ"),
+    ],
+}
+
+# Highlight paragraphs — 9 slots, same slot_idx logic
+HIGHLIGHT_PARAGRAPHS: dict[str, list[str]] = {
+    "CSN6": [
+        "แทบไม่เคยเลย ของอยู่ที่ไหนคุณรู้หมด ความจำเรื่องของใช้แม่นยำมาก",
+        "บางครั้งลืมบ้าง แต่หาเจอได้ไม่นาน ไม่ได้เป็นปัญหาในชีวิตประจำวัน",
+        "ลืมเป็นระยะๆ แต่ไม่ได้รบกวนชีวิตมาก ส่วนใหญ่หาเจอในที่สุด",
+        "ลืมค่อนข้างบ่อย บางทีหาของนานพอสมควร แต่ก็ยังพอรับได้",
+        "วางของแล้วจำไม่ได้บ่อยพอสมควร เริ่มรู้สึกว่ามันรบกวนบ้างเป็นบางครั้ง",
+        "ลืมบ่อยพอที่จะสังเกตได้ชัด หาของนานเป็นเรื่องปกติในชีวิตประจำวัน",
+        "วางของแล้วลืมค่อนข้างบ่อย เป็นส่วนหนึ่งของชีวิตไปแล้ว",
+        "ลืมบ่อยมาก หาของเป็นกิจวัตรประจำวันที่ทำเป็นประจำ",
+        "วางของแล้วจำไม่ได้บ่อยมากจนเกือบทุกวัน มันกลายเป็นเรื่องปกติในชีวิตไปแล้ว",
+    ],
+    "AGR9": [
+        "ไม่ค่อยจับได้ว่าคนอื่นรู้สึกยังไง ต้องมีสัญญาณชัดมากๆ ถึงจะรู้",
+        "จับได้บ้างแต่ต้องมีสัญญาณชัดๆ ไม่ได้อ่านออกโดยอัตโนมัติ",
+        "จับได้พอสมควรในสถานการณ์ที่คุ้นเคย กับคนไม่รู้จักก็ยังต้องเดาอยู่",
+        "อ่านอารมณ์ได้ค่อนข้างดีในหลายสถานการณ์ แต่ก็ยังผิดบ้างเป็นบางครั้ง",
+        "อ่านอารมณ์คนได้พอสมควร มักรู้สึกได้ว่าบรรยากาศในห้องเป็นยังไง",
+        "อ่านอารมณ์คนได้ค่อนข้างแม่น มักรู้ก่อนที่เขาจะพูดออกมา",
+        "อ่านอารมณ์คนได้ดีมาก เหมือนมีเซ็นเซอร์พิเศษ รู้สึกได้แทบจะทันที",
+        "อ่านอารมณ์คนได้แม่นมาก ทั้งจากสีหน้า น้ำเสียง และภาษากาย",
+        "อ่านอารมณ์คนได้แม่นมากเกือบทุกครั้ง เหมือนมีเรดาร์พิเศษในการรับรู้ความรู้สึกคนอื่น",
+    ],
+    "AGR5": [
+        "แคร์มากๆ เลย ปัญหาคนรอบข้างคือเรื่องของเราด้วยเสมอ",
+        "แคร์พอสมควร มักอยากช่วยเมื่อมีโอกาส",
+        "แคร์บ้างขึ้นอยู่กับว่าสนิทแค่ไหน ไม่ได้เป็นยังงั้นกับทุกคน",
+        "กลางๆ บางเรื่องก็แคร์ บางเรื่องก็ปล่อย ขึ้นอยู่กับสถานการณ์",
+        "ส่วนใหญ่ปล่อยให้เป็นเรื่องของเขา แต่ก็ไม่ได้เย็นชาซะทีเดียว",
+        "มักปล่อยให้เป็นเรื่องของคนอื่น ไม่ได้รู้สึกว่าต้องยื่นมือเข้าไปช่วย",
+        "ปัญหาของคนอื่นไม่ค่อยเกี่ยวกับเราเท่าไหร่ แต่ก็ไม่ได้แข็งใจซะทีเดียว",
+        "ไม่ค่อยรู้สึกว่าต้องแบกปัญหาของคนอื่น ทุกคนต้องจัดการตัวเองได้",
+        "ปัญหาของคนอื่นเป็นเรื่องของเขา ไม่ใช่หน้าที่ของเราที่จะต้องแบกไว้",
+    ],
+    "EXT4": [
+        "ไม่เลยเลย ชอบอยู่แถวหน้า เป็นจุดสนใจเป็นเรื่องปกติ",
+        "ส่วนใหญ่ชอบโดดเด่น แต่ก็ถอยได้บ้างเมื่อจำเป็น",
+        "กลางๆ บางทีก็ชอบ spotlight บางทีก็โอเคที่จะเงียบ",
+        "เอียงไปทางชอบอยู่แถวหลังมากกว่า แต่ก็ไม่ได้หนีเสมอไป",
+        "ชอบอยู่แถวหลังพอสมควร ปล่อยให้คนอื่น shine ดีกว่า",
+        "ค่อนข้างชอบอยู่แถวหลัง ไม่ชอบให้ทุกสายตามาจับจ้อง",
+        "ชอบหลบอยู่เงียบๆ ดีกว่า การเป็นจุดสนใจทำให้อึดอัดนิดนึง",
+        "ชอบอยู่แถวหลังมาก ขอสังเกตการณ์อยู่ห่างๆ ดีกว่า",
+        "ไม่ชอบเป็นจุดสนใจเลย ขอหลบอยู่หลังๆ เงียบๆ ดีที่สุด",
+    ],
+    "EST7": [
+        "นิ่งมากๆ อารมณ์แทบไม่กระเทือนง่ายๆ คงเส้นคงวาสูง",
+        "ค่อนข้างนิ่ง อารมณ์เปลี่ยนบ้างแต่ไม่บ่อย และไม่ได้รุนแรง",
+        "บางครั้งก็แปรปรวนบ้างตามเหตุการณ์ แต่โดยรวมยังคุมได้ดี",
+        "เปลี่ยนเป็นระยะๆ แต่ยังพอคาดเดาได้ ไม่ได้กระทบชีวิตมาก",
+        "อารมณ์เปลี่ยนพอสมควร บางวันดี บางวันไม่ดี โดยไม่ได้มีเหตุชัดเจน",
+        "เปลี่ยนค่อนข้างบ่อย คนใกล้ชิดสังเกตได้ บางทีตัวเองก็งงว่าทำไม",
+        "อารมณ์แปรปรวนบ่อย ขึ้นๆ ลงๆ ได้ในวันเดียว",
+        "อารมณ์เปลี่ยนเร็วและบ่อยมาก บางทีตัวเองก็ตามแทบไม่ทัน",
+        "อารมณ์แปรปรวนมากๆ เปลี่ยนได้ทันทีโดยไม่รู้ตัว เป็นส่วนหนึ่งของชีวิตประจำวัน",
+    ],
+    "OPN3": [
+        "ไม่ค่อยมีเลย คิดในแง่ปฏิบัติมากกว่า ภาพในหัวไม่ค่อยชัด",
+        "มีบ้างแต่ไม่ได้คิดฝันบ่อยๆ จินตนาการมาเป็นครั้งคราว",
+        "มีจินตนาการพอควร ไม่มากไม่น้อย บางทีก็มีภาพในหัว",
+        "จินตนาการค่อนข้างดี มีภาพในหัวได้เป็นระยะๆ",
+        "จินตนาการพอสมควร มีโลกส่วนตัวที่ทำงานบ้างเป็นบางเวลา",
+        "จินตนาการค่อนข้างดี ภาพในหัวชัดพอสมควร มีอยู่บ่อยๆ",
+        "จินตนาการดีและชัดเจน มีภาพและเรื่องราวในหัวได้ง่าย",
+        "จินตนาการชัดและสมบูรณ์มาก มีโลกส่วนตัวที่ทำงานตลอดเวลา",
+        "จินตนาการทำงานตลอดเวลา โลกในหัวสมบูรณ์มาก ภาพชัดเสมือนจริง",
+    ],
+    "OPN10": [
+        "แทบไม่มีเลย ชอบทำสิ่งที่คุ้นเคยมากกว่าคิดเรื่องใหม่ๆ",
+        "มีบ้างแต่ไม่บ่อย ไอเดียใหม่มาเป็นครั้งคราวเท่านั้น",
+        "มีไอเดียใหม่เป็นระยะๆ ไม่ได้มาตลอดแต่ก็ไม่ได้หายาก",
+        "มีไอเดียมาพอสมควร บางวันก็คิดได้เยอะกว่าปกติ",
+        "ไอเดียมาสม่ำเสมอพอสมควร ไม่ได้หยุดคิดนานๆ",
+        "ไอเดียมาค่อนข้างบ่อย บางทีหยุดไม่ค่อยได้",
+        "ไอเดียมาบ่อยมาก ต้องหาที่จดตลอด กลัวลืม",
+        "ไอเดียไม่หยุด คิดตลอดเวลา บางทีล้นหัวจนจัดการไม่ทัน",
+        "ไอเดียพุ่งพล่านตลอดเวลา หยุดคิดไม่ได้เลย สมองทำงานไม่หยุด",
+    ],
+}
+
 # Per-trait MAE on 1–5 scale vs number of answered items K (from offline eval).
-# Columns: EXT, EST, AGR, CSN, OPN — see project notebooks / Detail.md.
 _MAE_K_ANCHORS: tuple[int, ...] = (5, 10, 15, 20, 25, 30, 35, 40, 43, 49)
 _MAE_ROWS: tuple[tuple[float, float, float, float, float], ...] = (
     (0.2480, 0.4574, 0.2493, 0.2758, 0.2621),
@@ -160,7 +349,6 @@ _MAE_ROWS: tuple[tuple[float, float, float, float, float], ...] = (
 
 
 def _mean_trait_mae_at_k(k: float) -> float:
-    """Average MAE across five traits at answered-count K (linear segments between anchors)."""
     if k >= 50:
         return 0.0
     if k <= 0:
@@ -183,15 +371,18 @@ def _mean_trait_mae_at_k(k: float) -> float:
 
 
 def trust_pct_from_answered_count(n_answered: int) -> int:
-    """Map mean per-trait MAE at K to a 0–100% confidence score (lower MAE → higher %)."""
     if n_answered >= 50:
         return 100
     if n_answered <= 0:
         return 5
     mm = _mean_trait_mae_at_k(float(n_answered))
-    # ~0.30 MAE @ K≈5 → ~82%; ~0.015 @ K≈49 → ~99%
     raw = 100.0 - mm * 60.0
     return max(5, min(100, round(raw)))
+
+
+def slot_idx(score: float) -> int:
+    """Map a 1–5 score to one of 9 paragraph slots (each 0.5 wide)."""
+    return min(8, int((score - 1) / 0.5))
 
 
 def score_label(s: float) -> str:
@@ -210,7 +401,6 @@ def inject_css() -> None:
     st.markdown(
         """
 <style>
-    /* Lock app to dark chrome; ignore prefers-color-scheme for Streamlit + native widgets */
     :root, .stApp, [data-testid="stAppViewContainer"], section.main {
         color-scheme: dark !important;
     }
@@ -251,7 +441,71 @@ def inject_css() -> None:
     h1 { font-weight: 400 !important; color: #f0ecff !important; }
     .muted { color: #8a84a3; font-size: 15px; line-height: 1.75; }
     .section-head { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #8a84a3; margin: 2rem 0 1rem; }
-    /* Class added by pin_result_sticky_footer() in parent document */
+
+    /* ── Paragraph result cards ── */
+    .trait-card {
+        background: #13101e;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-left: 3px solid var(--tc);
+        border-radius: 18px;
+        padding: 20px 22px;
+        margin-bottom: 10px;
+    }
+    .trait-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 10px;
+        gap: 12px;
+    }
+    .trait-card-name { font-size: 15px; font-weight: 500; color: #f0ecff; }
+    .trait-card-th { font-size: 11px; color: #8a84a3; margin-top: 2px; }
+    .trait-card-tag {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--tc);
+        padding: 4px 12px;
+        border-radius: 99px;
+        border: 1px solid var(--tc);
+        white-space: nowrap;
+        opacity: 0.9;
+        flex-shrink: 0;
+    }
+    .trait-card-para {
+        font-size: 14px;
+        color: #a09bbf;
+        line-height: 1.75;
+        margin: 0;
+    }
+
+    /* ── Highlight paragraph cards ── */
+    .hl-card {
+        background: #13101e;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 16px;
+        padding: 16px 18px;
+        margin-bottom: 10px;
+    }
+    .hl-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        gap: 10px;
+    }
+    .hl-card-label { font-size: 14px; font-weight: 500; color: #f0ecff; }
+    .hl-answered-tag {
+        font-size: 10px; padding: 3px 10px; border-radius: 99px;
+        color: #b9f5e8; border: 1px solid rgba(100,220,200,0.4);
+        background: rgba(30,80,70,0.3); flex-shrink: 0;
+    }
+    .hl-card-para {
+        font-size: 13px;
+        color: #a09bbf;
+        line-height: 1.65;
+        margin: 0;
+    }
+
     button.b5-restart-sticky-btn {
         background-color: #13101e !important;
         border: 1px solid rgba(255, 255, 255, 0.14) !important;
@@ -261,7 +515,6 @@ def inject_css() -> None:
         border-color: rgba(255, 100, 100, 0.45) !important;
         color: #ff9a9a !important;
     }
-    /* Purple primary / dark secondary on every page (not only quiz) */
     .stApp button[data-testid="baseButton-primary"],
     .stApp button[data-testid="stBaseButton-primary"] {
         background: linear-gradient(180deg, rgba(127, 119, 221, 0.38), rgba(83, 74, 183, 0.22)) !important;
@@ -295,7 +548,6 @@ def inject_css() -> None:
     .stApp button[data-testid="stBaseButton-secondary"]:disabled {
         opacity: 0.45 !important;
     }
-    /* Progress bar + captions stay readable on dark */
     [data-testid="stProgress"] > div { background-color: rgba(255,255,255,0.12) !important; }
     div[data-testid="stCaption"] { color: #8a84a3 !important; }
 </style>
@@ -305,8 +557,6 @@ def inject_css() -> None:
 
 
 def pin_result_sticky_footer() -> None:
-    """Pin the restart row to the viewport (parent document). Pure CSS fails here because (1) extra
-    widgets appended after the button break :last-child, and (2) Streamlit ancestors use transforms."""
     html = r"""
 <script>
 (function () {
@@ -470,7 +720,6 @@ def reset_all() -> None:
 
 
 def start_quiz(pred_bundle: dict[str, Any] | None) -> None:
-    """Shuffle the 43 non-meme items first, then shuffle the 7 meme highlights at the end."""
     import random
 
     raw_meme = (
@@ -626,31 +875,9 @@ def render_quiz(pred_bundle: dict[str, Any] | None) -> None:
             st.rerun()
 
 
-def trait_bar_row(trait: str, name: str, th: str, score: float) -> None:
-    pct = (score - 1) / 4 * 100
-    color = TRAIT_COLORS[trait]
-    st.markdown(
-        f'<div style="display:grid;grid-template-columns:120px 1fr 52px;gap:12px;align-items:center;margin-bottom:14px">'
-        f'<div><span style="font-size:13px;color:#f0ecff">{name}</span>'
-        f'<span style="display:block;font-size:11px;color:#8a84a3">{th}</span></div>'
-        f'<div class="bar-track"><div class="bar-fill" style="width:{pct}%;background:{color}"></div></div>'
-        f'<div style="font-size:1.1rem;text-align:right;color:{color}">{score:.2f}</div></div>',
-        unsafe_allow_html=True,
-    )
-
-
-@st.dialog("เริ่มใหม่เลยเหรอ?")
-def restart_dialog() -> None:
-    st.markdown("คำตอบและผลลัพธ์ทั้งหมดจะหายไปนะ กดยืนยันถ้ามั่นใจแล้ว")
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("ใช่เลย เริ่มใหม่!", type="primary", use_container_width=True):
-            reset_all()
-            st.rerun()
-    with c2:
-        if st.button("เดี๋ยวก่อน ดูผลต่อ", use_container_width=True):
-            st.rerun()
-
+# ---------------------------------------------------------------------------
+# New summary result page — paragraph-based, no bars
+# ---------------------------------------------------------------------------
 
 def render_results(pred_bundle: dict[str, Any] | None) -> None:
     if pred_bundle is None:
@@ -672,10 +899,144 @@ def render_results(pred_bundle: dict[str, Any] | None) -> None:
     conf = trust_pct_from_answered_count(n_answered)
     trait_scores: dict[str, float] = out["trait_scores"]
     primary = out["primary"]
-    secondary = out["secondary"]
 
+    # ── Header ──────────────────────────────────────────────────────────────
     st.markdown('<p class="eyebrow">ผลลัพธ์ของคุณ</p>', unsafe_allow_html=True)
     st.markdown("### นี่คือตัวตนของคุณ ✦")
+    st.markdown(
+        f'<p class="muted">เราประกอบภาพบุคลิกครบ 50 หัวข้อ — {n_answered} ข้อจากคำตอบของคุณ '
+        f"และ {n_fill} ข้อจากโมเดลเติม</p>",
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        f"""
+<div class="stat-grid" style="grid-template-columns:1fr 1fr 1fr">
+  <div class="stat-box"><div class="stat-num">{n_answered}<small style="opacity:0.6">/50</small></div>
+  <div class="stat-lbl">คำตอบของคุณ</div></div>
+  <div class="stat-box"><div class="stat-num">{n_fill}</div><div class="stat-lbl">โมเดลเติมให้</div></div>
+  <div class="stat-box"><div class="stat-num">{conf}<small style="opacity:0.6">%</small></div>
+  <div class="stat-lbl">ความมั่นใจ</div></div>
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # ── Big Five paragraph cards ─────────────────────────────────────────────
+    st.markdown('<div class="section-head">Big Five — ภาพรวม 5 ด้าน</div>', unsafe_allow_html=True)
+
+    trait_order = ["EXT", "EST", "AGR", "CSN", "OPN"]
+    for tid in trait_order:
+        if tid not in trait_scores:
+            continue
+        score = float(trait_scores[tid])
+        color = TRAIT_COLORS[tid]
+        spec = TRAITS[tid]
+        si = slot_idx(score)
+        tag, para = TRAIT_PARAGRAPHS[tid][si]
+
+        st.markdown(
+            f'<div class="trait-card" style="--tc:{color}">'
+            f'<div class="trait-card-header">'
+            f'<div><div class="trait-card-name">{spec["name"]}</div>'
+            f'<div class="trait-card-th">{spec["th"]}</div></div>'
+            f'<span class="trait-card-tag">{tag}</span>'
+            f'</div>'
+            f'<p class="trait-card-para">{para}</p>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+
+    # ── Highlight paragraph cards ────────────────────────────────────────────
+    st.markdown('<div class="section-head">ไฮไลต์สำคัญ 7 อย่าง</div>', unsafe_allow_html=True)
+
+    for mid in meme_order:
+        if mid not in HIGHLIGHT_PARAGRAPHS or mid not in ALL_QUESTIONS:
+            continue
+
+        tr = ALL_QUESTIONS[mid][0]
+        color = TRAIT_COLORS[tr]
+        meta = MEME_META.get(mid, {})
+        label = meta.get("label", mid)
+        val = float(primary["answered"].get(mid, primary["predicted"].get(mid, 3.0)))
+        is_user = mid in answers
+        si = slot_idx(val)
+        para = HIGHLIGHT_PARAGRAPHS[mid][si]
+
+        answered_tag = (
+            '<span class="hl-answered-tag">คุณตอบ</span>' if is_user else ""
+        )
+        st.markdown(
+            f'<div class="hl-card">'
+            f'<div class="hl-card-header">'
+            f'<span class="hl-card-label" style="color:{color}">{label}</span>'
+            f'{answered_tag}'
+            f'</div>'
+            f'<p class="hl-card-para">{para}</p>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+
+    # ── Deep-dive button → detail page ───────────────────────────────────────
+    st.markdown(
+        """
+<div style="font-size:12px;color:#5a5472;line-height:1.7;padding:18px;background:#13101e;
+border:1px solid rgba(255,255,255,0.08);border-radius:12px;margin-top:24px;margin-bottom:8px">
+<strong style="color:#8a84a3">หมายเหตุ:</strong> ค่าที่ AI เติมเป็นการประมาณทางสถิติ ไม่ใช่คำวินิจฉัยทางจิตวิทยานะ ·
+สเกล 1–5 ตามมาตรฐาน IPIP · ข้อมูลจาก Big Five Personality Test (Kaggle, Nov 2018)
+</div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    if st.button(
+        "ดูตัวเลขและ AI เดาแบบละเอียด →",
+        use_container_width=True,
+        type="secondary",
+        key="go_to_detail",
+    ):
+        st.session_state.page = "result_detail"
+        st.rerun()
+
+    if st.button(
+        "← เล่นใหม่อีกรอบ",
+        use_container_width=True,
+        type="secondary",
+        key="result_restart_open_dialog",
+    ):
+        restart_dialog()
+
+    pin_result_sticky_footer()
+
+
+# ---------------------------------------------------------------------------
+# Original detailed result page (numbers + AI predictions)
+# ---------------------------------------------------------------------------
+
+def render_results_detail(pred_bundle: dict[str, Any] | None) -> None:
+    if pred_bundle is None:
+        st.error("ไม่พบโมเดล — ไม่สามารถแสดงผลได้")
+        return
+
+    st.markdown(
+        '<div class="results-footer-marker" aria-hidden="true" style="display:none"></div>',
+        unsafe_allow_html=True,
+    )
+
+    answers = {k: float(v) for k, v in st.session_state.answers.items()}
+    predict_fn: Callable = pred_bundle["predict_personality"]
+    meme_order: list[str] = pred_bundle["meme_questions"]
+
+    out = predict_fn(answers)
+    n_answered = out["n_answered"]
+    n_fill = 50 - n_answered
+    conf = trust_pct_from_answered_count(n_answered)
+    trait_scores: dict[str, float] = out["trait_scores"]
+    primary = out["primary"]
+    secondary = out["secondary"]
+
+    st.markdown('<p class="eyebrow">รายละเอียดเชิงลึก</p>', unsafe_allow_html=True)
+    st.markdown("### ตัวเลขและ AI เดา 👀")
     st.markdown(
         f'<p class="muted">เราประกอบภาพบุคลิกครบ 50 หัวข้อ — {n_answered} ข้อจากคำตอบของคุณ '
         f"และ {n_fill} ข้อจากโมเดลเติม</p>",
@@ -775,6 +1136,15 @@ border:1px solid rgba(255,255,255,0.08);border-radius:12px;margin-top:24px">
     )
 
     if st.button(
+        "← กลับหน้าสรุป",
+        use_container_width=True,
+        type="secondary",
+        key="back_to_summary",
+    ):
+        st.session_state.page = "result"
+        st.rerun()
+
+    if st.button(
         "← เล่นใหม่อีกรอบ",
         use_container_width=True,
         type="secondary",
@@ -783,6 +1153,32 @@ border:1px solid rgba(255,255,255,0.08);border-radius:12px;margin-top:24px">
         restart_dialog()
 
     pin_result_sticky_footer()
+
+
+def trait_bar_row(trait: str, name: str, th: str, score: float) -> None:
+    pct = (score - 1) / 4 * 100
+    color = TRAIT_COLORS[trait]
+    st.markdown(
+        f'<div style="display:grid;grid-template-columns:120px 1fr 52px;gap:12px;align-items:center;margin-bottom:14px">'
+        f'<div><span style="font-size:13px;color:#f0ecff">{name}</span>'
+        f'<span style="display:block;font-size:11px;color:#8a84a3">{th}</span></div>'
+        f'<div class="bar-track"><div class="bar-fill" style="width:{pct}%;background:{color}"></div></div>'
+        f'<div style="font-size:1.1rem;text-align:right;color:{color}">{score:.2f}</div></div>',
+        unsafe_allow_html=True,
+    )
+
+
+@st.dialog("เริ่มใหม่เลยเหรอ?")
+def restart_dialog() -> None:
+    st.markdown("คำตอบและผลลัพธ์ทั้งหมดจะหายไปนะ กดยืนยันถ้ามั่นใจแล้ว")
+    c1, c2 = st.columns(2)
+    with c1:
+        if st.button("ใช่เลย เริ่มใหม่!", type="primary", use_container_width=True):
+            reset_all()
+            st.rerun()
+    with c2:
+        if st.button("เดี๋ยวก่อน ดูผลต่อ", use_container_width=True):
+            st.rerun()
 
 
 def main() -> None:
@@ -811,6 +1207,8 @@ def main() -> None:
         render_quiz(pred_bundle)
     elif st.session_state.page == "result":
         render_results(pred_bundle)
+    elif st.session_state.page == "result_detail":
+        render_results_detail(pred_bundle)
 
 
 if __name__ == "__main__":
