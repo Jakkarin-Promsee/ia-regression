@@ -6,7 +6,7 @@ Companion to [`README.md`](README.md): start there for **setup**, **repository l
 
 **IA** = **I**ndicator-**A**ugmented (the project nickname plays on “AI,” but the acronym is literal).
 
-We predict the full **50-item** response vector from **partial** quizzes by regressing on **100 features**: **[masked values ∥ observation indicators]**. Each missing item is **zero-padded** in the value block; the matching **binary indicator** is 0 when unasked and 1 when answered. That separation is what lets linear Ridge distinguish **“not asked yet”** from **“asked and scored low.”** In missing-data terms, the indicators carry the **observation pattern**; in regression terms, they are **missingness / inclusion indicators** paired with the padded design vector—hence _indicator-augmented_ regression. Training uses **random-K masking** plus **multi-mask augmentation** so one estimator is calibrated for every completion count _K_.
+We predict the full **50-item** response vector from **partial** quizzes by regressing on **100 features**: **[masked values ∥ observation indicators]**. Each missing item is **zero-padded** in the value block; the matching **binary indicator** is 0 when unasked and 1 when answered. That separation is what lets linear Ridge distinguish **“not asked yet”** from **“asked and scored low.”** In missing-data terms, the indicators carry the **observation pattern**; in regression terms, they are **missingness / inclusion indicators** paired with the padded design vector—hence _indicator-augmented_ regression. Training uses **random-K masking** (see below) so one estimator is calibrated for every completion count _K_.
 
 ---
 
@@ -111,36 +111,40 @@ so missing values don't get confused with low real scores.
 Target: the original 50 answers. So we're doing **matrix completion** — given partial
 rows, reconstruct full rows.
 
-### The random-K training trick + multi-mask augmentation
+### The rank-based `random_mask` algorithm (implementation in `main.ipynb`)
 
-Two stacked tricks make a single linear model work for every K:
+Training and evaluation need to mimic real users: each person answers **exactly K** of the 50 items, on a **random subset** (order does not enter the model—only which items are observed). The notebook implements this **without** nested Python loops over questions by using **per-row random ranks**:
 
-**(1) Random K per row.** For every training row we pick a random `K ∈ [5, 50]` and a
-random subset of K questions to keep. The other `50 − K` are zeroed out (their mask bit
-set to 0). The model sees every plausible "amount of information" scenario in the same
-training run — so it learns weights that work simultaneously for K=5, K=13, K=30, all
-the way to K=50, instead of specializing on any one.
+1. Draw i.i.d. `scores ~ Uniform(0,1)` for each of the 50 columns and each row.
+2. Convert to **ranks** `1 … 50` within each row (`argsort` twice gives stable ordinal ranks).
+3. Draw one integer **K** per row: `K ~ UniformInteger(k_min, k_max)` (inclusive).
+4. Set **`mask[i, j] = 1`** iff **`rank[i, j] ≤ K[i]`** — the **K smallest ranks** are the “answered” items. Multiply **`X_masked = X * mask`** so unasked positions are 0.
 
-**(2) Multi-mask augmentation.** Each training row is reused `N_AUG = 5` times, and
-each copy gets a _different_ random subset masked out. So one user's row becomes 5
-training examples: same underlying personality, 5 independent "observation windows".
+That procedure yields a **uniform random K-subset** of columns per row (each of the C(50,K) subsets equally likely for fixed K). When **`k_min < k_max`**, each training row gets its **own random K** between 5 and 50, so one Ridge fit sees every information level in one pass. When **`k_min == k_max == k`**, every row has **exactly k** observed items — used inside **k-iterator loops** for validation and test metrics.
 
 ```python
-N_AUG = 5
-X_train_rep = np.tile(X_train, (N_AUG, 1))                                # 5 copies of every user
-Xtr_masked, Mtr = random_mask(X_train_rep, k_min=5, k_max=50, seed=...)   # all independent
+def random_mask(X, k_min=5, k_max=50, seed=None):
+    rng = np.random.default_rng(seed)
+    n, q = X.shape
+    scores = rng.random((n, q))
+    ranks = np.argsort(np.argsort(scores, axis=1), axis=1) + 1  # 1..q
+    ks = rng.integers(k_min, k_max + 1, size=n).reshape(-1, 1)
+    mask = (ranks <= ks).astype(np.float32)
+    return X * mask, mask
 ```
 
-Why this matters beyond just "more data":
+### The random-K training trick
 
-- It enforces _consistency_ — the model is pushed to recover the same underlying answers
-  no matter which subset it's given. That's a regularizer specific to this task.
-- For users with distinctive profiles, the model now sees them under many different
-  "levels of evidence", so it learns to recover them from few signals as well as many.
-- The biggest gain is at low K (5, 10, 13), exactly where users actually quit.
+For **training**, the notebook calls `random_mask(X_train, k_min=5, k_max=50, …)` once: each row keeps a random count K and a random which-K set. The target **Y** is still the full 50 answers (`Ytr = X_train`). That prevents the model from only learning the identity map on fully observed rows and forces it to impute under missingness patterns that match deployment.
 
 If we trained only on full inputs, the model would learn to copy the input perfectly
 and fall apart at inference when entries are missing.
+
+### Where the **k iterator** loops appear
+
+**Hyperparameter search (`ridge_validation_mae`).** After fitting Ridge on the masked training matrix, the notebook averages validation MAE over **fixed-K** masks. For each **`k` in `(5, 10, 20, 30, 40, 50)`** it calls `random_mask(x_val, k_min=k, k_max=k, seed=k)`, predicts, clips, overwrites known answers, and accumulates MAE on **missing** cells only. The mean over that **k-loop** is the scalar score used to compare `alpha` values (the notebook tries e.g. `0.1, 1, 10, 100, 200, 400, 800, 1600`).
+
+**Test evaluation (`evaluate_model`).** An outer loop runs **`for k in k_values`** (in the shipped notebook: `(5, 10, 15, 20, 25, 30, 35, 40, 43, 49)`). An inner loop runs **`for s in range(N_EVAL_SEEDS)`** (e.g. 10 seeds) calling `random_mask(..., k_min=k, k_max=k, seed=1000 + s)` so each **K** is reported with low variance. The same k-structured evaluation applies to Global Mean, Trait Mean, and Ridge.
 
 ### The model: multi-output Ridge regression
 
@@ -151,8 +155,7 @@ output question `q`:
 pred[q]  ≈  w_q · [X_masked | mask] + b_q
 ```
 
-`alpha` is selected on a held-out validation fold from `{0.1, 1, 10, 100}` by averaging
-MAE across K=5,10,20,30,50.
+`alpha` is selected on the validation fold by minimizing the **mean** of validation MAEs over the **k-iterator** grid `K ∈ {5, 10, 20, 30, 40, 50}` (each evaluated with `k_min = k_max = K`). The notebook’s search grid extends beyond `{0.1, 1, 10, 100}` to larger `alpha` values when needed (see `models/main.ipynb`).
 
 At inference time we overwrite predictions with the user's actual answers (no point
 guessing what they already told us) and clip to `[1, 5]` so we don't return Likert
@@ -185,8 +188,7 @@ Ridge is the only one that can use cross-trait info (e.g. high `OPN3` → expect
 `OPN10`), so we expect it to win — especially at low K where every bit of cross-question
 signal matters.
 
-Evaluation reports three MAEs per model per K ∈ {5, 10, 13, 20, 30, 40, 50}, averaged
-over 3 random seeds:
+Evaluation reports three MAEs per model per **K** (see the `k_values` tuple in the notebook; it includes fine steps such as 43 and 49), averaged over **`N_EVAL_SEEDS`** random masks per K (e.g. 10 seeds):
 
 - MAE on missing answers (1–5 scale)
 - MAE on the 5 trait scores (0–1) — drives the precision bar
@@ -234,10 +236,10 @@ B5Personality/
 5. **Model And Algorithm**
    - Approach + design rationale
    - Train/Val/Test split (70/15/15)
-   - `random_mask()` — vectorised partial-answer simulator
+   - `random_mask()` — **rank-based** vectorised mask: random K per row for training; `k_min=k_max=k` inside **k-loops** for validation and test
    - Trait-mean and global-mean baselines
-   - Ridge training with **multi-mask augmentation** (`N_AUG = 5`) and alpha selection
-   - Evaluation framework + 3-panel comparison plot
+   - Ridge training on masked features, **`alpha`** chosen via validation **k-iterator** MAE
+   - Evaluation framework (outer **k** loop × inner **seed** loop) + precision plots
    - Best-model persistence + `predict_personality()` helper for the front-end
 
 Run the cells top to bottom; total wall-clock is ~30 seconds on a laptop CPU.
