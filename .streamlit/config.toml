@@ -1,0 +1,10 @@
+# Force dark UI regardless of OS / browser light-dark preference.
+# See: https://docs.streamlit.io/develop/concepts/configuration#theme-options
+
+[theme]
+base = "dark"
+primaryColor = "#7f77dd"
+backgroundColor = "#0a0910"
+secondaryBackgroundColor = "#13101e"
+textColor = "#f0ecff"
+font = "sans serif"

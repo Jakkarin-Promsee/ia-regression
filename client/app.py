@@ -210,6 +210,20 @@ def inject_css() -> None:
     st.markdown(
         """
 <style>
+    /* Lock app to dark chrome; ignore prefers-color-scheme for Streamlit + native widgets */
+    :root, .stApp, [data-testid="stAppViewContainer"], section.main {
+        color-scheme: dark !important;
+    }
+    .stApp {
+        background-color: #0a0910 !important;
+        color: #f0ecff !important;
+    }
+    [data-testid="stAppViewContainer"] {
+        background-color: #0a0910 !important;
+    }
+    section.main {
+        background-color: transparent !important;
+    }
     .block-container { padding-top: 2rem !important; max-width: 640px !important; }
     div[data-testid="stVerticalBlock"] > div { gap: 0.6rem; }
     .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 1.5rem; }
@@ -247,40 +261,43 @@ def inject_css() -> None:
         border-color: rgba(255, 100, 100, 0.45) !important;
         color: #ff9a9a !important;
     }
-    /* Quiz page: replace default red primary with purple accent (matches app.html) */
-    .stApp:has(.b5-quiz-page) button[data-testid="baseButton-primary"],
-    .stApp:has(.b5-quiz-page) button[data-testid="stBaseButton-primary"] {
+    /* Purple primary / dark secondary on every page (not only quiz) */
+    .stApp button[data-testid="baseButton-primary"],
+    .stApp button[data-testid="stBaseButton-primary"] {
         background: linear-gradient(180deg, rgba(127, 119, 221, 0.38), rgba(83, 74, 183, 0.22)) !important;
         border: 1px solid rgba(127, 119, 221, 0.48) !important;
         color: #ece9ff !important;
     }
-    .stApp:has(.b5-quiz-page) button[data-testid="baseButton-primary"]:hover:not(:disabled),
-    .stApp:has(.b5-quiz-page) button[data-testid="stBaseButton-primary"]:hover:not(:disabled) {
+    .stApp button[data-testid="baseButton-primary"]:hover:not(:disabled),
+    .stApp button[data-testid="stBaseButton-primary"]:hover:not(:disabled) {
         background: rgba(127, 119, 221, 0.42) !important;
         border-color: rgba(160, 150, 240, 0.65) !important;
         color: #ffffff !important;
     }
-    .stApp:has(.b5-quiz-page) button[data-testid="baseButton-primary"]:disabled,
-    .stApp:has(.b5-quiz-page) button[data-testid="stBaseButton-primary"]:disabled {
+    .stApp button[data-testid="baseButton-primary"]:disabled,
+    .stApp button[data-testid="stBaseButton-primary"]:disabled {
         background: rgba(127, 119, 221, 0.12) !important;
         border-color: rgba(255, 255, 255, 0.08) !important;
         color: #6a6288 !important;
     }
-    .stApp:has(.b5-quiz-page) button[data-testid="baseButton-secondary"],
-    .stApp:has(.b5-quiz-page) button[data-testid="stBaseButton-secondary"] {
+    .stApp button[data-testid="baseButton-secondary"],
+    .stApp button[data-testid="stBaseButton-secondary"] {
         background: #1c1828 !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
         color: #d4cfe8 !important;
     }
-    .stApp:has(.b5-quiz-page) button[data-testid="baseButton-secondary"]:hover:not(:disabled),
-    .stApp:has(.b5-quiz-page) button[data-testid="stBaseButton-secondary"]:hover:not(:disabled) {
+    .stApp button[data-testid="baseButton-secondary"]:hover:not(:disabled),
+    .stApp button[data-testid="stBaseButton-secondary"]:hover:not(:disabled) {
         border-color: rgba(255, 255, 255, 0.18) !important;
         background: rgba(127, 119, 221, 0.1) !important;
     }
-    .stApp:has(.b5-quiz-page) button[data-testid="baseButton-secondary"]:disabled,
-    .stApp:has(.b5-quiz-page) button[data-testid="stBaseButton-secondary"]:disabled {
+    .stApp button[data-testid="baseButton-secondary"]:disabled,
+    .stApp button[data-testid="stBaseButton-secondary"]:disabled {
         opacity: 0.45 !important;
     }
+    /* Progress bar + captions stay readable on dark */
+    [data-testid="stProgress"] > div { background-color: rgba(255,255,255,0.12) !important; }
+    div[data-testid="stCaption"] { color: #8a84a3 !important; }
 </style>
         """,
         unsafe_allow_html=True,
