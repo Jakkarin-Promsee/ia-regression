@@ -477,7 +477,7 @@ def start_quiz(pred_bundle: dict[str, Any] | None) -> None:
 
 def render_welcome(pred_bundle: dict[str, Any] | None) -> None:
     st.markdown('<p class="eyebrow">Big Five Personality</p>', unsafe_allow_html=True)
-    st.markdown("## แกเป็น _คนแบบไหน_ กันแน่?")
+    st.markdown("## คุณเป็น _คนแบบไหน_ กันแน่?")
     st.markdown(
         '<p class="muted">แบบทดสอบบุคลิกภาพ 50 ข้อ เทรนมาจากคนกว่า 1 ล้านคน '
         "— ตอบแค่ 5 ข้อก็ดูผลได้เลย ที่เหลือ AI จะดูให้เอง 🧠</p>",
@@ -496,9 +496,9 @@ def render_welcome(pred_bundle: dict[str, Any] | None) -> None:
     st.markdown(
         """
 <div class="stat-grid">
-  <div class="stat-box"><div class="stat-num">50</div><div class="stat-lbl">ข้อทั้งหมด</div></div>
+  <div class="stat-box"><div class="stat-num">50</div><div class="stat-lbl">จำนวณข้อทั้งหมด</div></div>
   <div class="stat-box"><div class="stat-num">5+</div><div class="stat-lbl">ตอบแค่นี้ก็พอ</div></div>
-  <div class="stat-box"><div class="stat-num">~30</div><div class="stat-lbl">ข้อแล้วแม่นมาก</div></div>
+  <div class="stat-box"><div class="stat-num">AI</div><div class="stat-lbl">ยิ่งตอบมาก AI ยิ่งทายผลแม่น</div></div>
 </div>
         """,
         unsafe_allow_html=True,
@@ -600,7 +600,7 @@ def render_quiz(pred_bundle: dict[str, Any] | None) -> None:
     if n_ans >= 5:
         st.markdown("---")
         if st.button(
-            "✦ พอแล้ว ดูผลได้เลย! — ข้อที่ยังไม่ตอบ AI จะดูให้เอง ✨",
+            "✦ พอแล้ว ดูผลได้เลย! — แต่ยิ่งตอบมาก AI ยิ่งทายผลเเม่นขึ้นนะ ✨",
             use_container_width=True,
             type="secondary",
             key="quiz_early_finish",
@@ -657,8 +657,8 @@ def render_results(pred_bundle: dict[str, Any] | None) -> None:
     primary = out["primary"]
     secondary = out["secondary"]
 
-    st.markdown('<p class="eyebrow">ผลลัพธ์ของแก</p>', unsafe_allow_html=True)
-    st.markdown("### นี่คือตัวตนของแก ✦")
+    st.markdown('<p class="eyebrow">ผลลัพธ์ของคุณ</p>', unsafe_allow_html=True)
+    st.markdown("### นี่คือตัวตนของคุณ ✦")
     st.markdown(
         f'<p class="muted">เราประกอบภาพบุคลิกครบ 50 หัวข้อ — {n_answered} ข้อจากคำตอบของคุณ '
         f"และ {n_fill} ข้อจากโมเดลเติม</p>",
